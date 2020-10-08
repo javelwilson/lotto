@@ -1,5 +1,6 @@
 const assert = require('assert')
 const ganache = require('ganache-cli')
+const { utils } = require('mocha')
 const Web3 = require('web3')
 
 const provider = ganache.provider()
@@ -23,11 +24,55 @@ describe('Lotto', () => {
         assert.ok(lotto.options.address)
     })
 
+    it('accepts the entry fee in ether', async () => {
+        const entryFee = await lotto.methods.entryFee().call({
+            from: accounts[0]
+        })
+        assert.strictEqual(entryFee, web3.utils.toWei('1', 'ether'))
+    })
+
     it('requires an entryFee greater or equal to 1 ether', async () => {
         try{
             const lotto2 = await new web3.eth.Contract(JSON.parse(interface))
             .deploy({data: bytecode, arguments: [0]})
             .send({from: accounts[0], gas: '1000000'})
+            assert(false)
+        } catch (err) {
+            assert(err)
+        }
+    })
+
+    it('allows one account to enter', async () => {
+        await lotto.methods.enter().send({
+            from: accounts[1],
+            value: web3.utils.toWei('1', 'ether')
+        })
+
+        const players = await lotto.methods.getPlayers().call({
+            from: accounts[0]
+        })
+
+        assert.strictEqual(players.length, 1)
+    })
+
+    it('requires that the manager cannot enter', async () => {
+        try {
+            lotto.methods.enter().send({
+                from: accounts[0],
+                value: utils.eth.toWei('1', 'ether')
+            })
+            assert(false)
+        } catch (err) {
+            assert(err)
+        }
+    })
+
+    it('requires that the entryFee be matched upon entering', () => {
+        try {
+            lotto.methods.enter().send({
+                from: accounts[1],
+                value: utils.eth.toWei('2', 'ether')
+            })
             assert(false)
         } catch (err) {
             assert(err)
