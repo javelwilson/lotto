@@ -4,8 +4,8 @@ contract Lotto {
     address public manager;
     uint public entryFee;
 
-    constructor(uint amount) {
-        require(amount * 1 ether >= 1 ether)
+    constructor(uint amount) public {
+        require(amount * 1 ether >= 1 ether);
         manager = msg.sender;
         entryFee = amount;
     }
