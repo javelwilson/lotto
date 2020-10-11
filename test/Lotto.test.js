@@ -96,6 +96,12 @@ describe('Lotto', () => {
       value: web3.utils.toWei('1', 'ether'),
     })
 
+    players = await lotto.methods.getPlayers().call({
+        from: accounts[0]
+    })
+
+    assert.strictEqual(players.length, 1)
+
     await lotto.methods.pickWinner().send({
       from: accounts[0],
     })
@@ -104,6 +110,11 @@ describe('Lotto', () => {
       from: accounts[0],
     })
 
+    players = await lotto.methods.getPlayers().call({
+        from: accounts[0]
+    })
+
+    assert.strictEqual(players.length, 0)
     assert.strictEqual(previousWinners.length, 1)
   })
 })
