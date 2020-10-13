@@ -24,7 +24,7 @@ contract Lotto {
 
     function pickWinner() public {
         require(msg.sender == manager);
-        uint index = 0;
+        uint index = random();
         address winner = players[index];
         previousWinners.push(winner);
         players = new address[](0);
